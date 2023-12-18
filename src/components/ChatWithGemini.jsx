@@ -4,9 +4,13 @@ import { Input } from "@chakra-ui/react";
 import { InputGroup, Box, InputRightElement, Button } from "@chakra-ui/react"
 import { motion } from 'framer-motion'
 import { Text } from '@chakra-ui/react'
+import { Textarea } from "@chakra-ui/react"
+import { DeleteIcon } from '@chakra-ui/icons'
+import { ArrowForwardIcon } from '@chakra-ui/icons'
 import ReactMarkdown from 'react-markdown'
 import GeminiService from "../service/gemini.service";
 import useGemini from "../hooks/useGemini";
+import PropTypes from 'prop-types'
 
 const ChatWithGemini = () => {
 
@@ -23,8 +27,8 @@ const ChatWithGemini = () => {
 
     const handleSend = async () => {
         if (!input) return
-        updateMessage([...messages, { "role": "user", "parts": [{ "text": input }] }])
         setInput('')
+        updateMessage([...messages, { "role": "user", "parts": [{ "text": input }] }])
         sendMessages({ message: input, history: messages })
     }
 
@@ -32,26 +36,69 @@ const ChatWithGemini = () => {
         <>
             <Box className="w-[100%] self-center max-w-[1400px] m-4 overflow-auto rounded-md h-[80%] items-center">
                 <Box className="overflow-auto px-10 py-4 flex flex-col">
-                    {messages.map((message, index) => <RenderMessage loading={loading} key={index} messageLength={messages.length} message={message} msgIndex={index} />)}
+                    {messages.length > 0 ? messages.map((message, index) => <RenderMessage loading={loading} key={index} messageLength={messages.length} message={message} msgIndex={index} />) :
+                        <Introduction />
+                    }
+
                     <AlwaysScrollToBottom />
                 </Box>
             </Box>
-            <Box className="flex max-w-[1400px]  px-10 pt-2 w-[100%] self-center">
-                <InputGroup size="md">
-                    <Input color={'white'} placeholder="Type a message" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} />
-                    <InputRightElement width="9rem" gap={2}>
-                        <Button h="1.75rem" size="sm" onClick={handleSend}>
+            <Box className="flex max-w-[1400px] px-10 pt-2 w-[100%] self-center">
+                <Box className="flex w-[100%] gap-2 justify-between items-center">
+                    <Textarea
+                        placeholder="Type a message"
+                        value={input || ""}
+                        sx={{
+                            resize: 'none',
+                            padding: '8px 14px 8px 14px',
+                            background: 'gray.700',
+                            color: 'white',
+                            _placeholder: { color: 'white' },
+                            h: '1.75rem',
+                        }}
+                        onChange={e => setInput(e.target.value)}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault()
+                                handleSend()
+                            }
+                        }}
+                        variant={'unstyled'}
+                    />
+                    <Box className="flex gap-2 flex-col">
+                        <Button colorScheme="whatsapp" h="1.75rem" size="sm" onClick={handleSend} rightIcon={<ArrowForwardIcon />}>
                             Send
                         </Button>
-                        <Button h="1.75rem" size="sm" onClick={() => updateMessage([])}>
+                        <Button color={"white"} _hover={{ bg: "blue.500", }} variant={'outline'} h="1.75rem" size="sm" onClick={() => updateMessage([])} rightIcon={<DeleteIcon />}>
                             Clear
                         </Button>
-                    </InputRightElement>
-                </InputGroup>
+                    </Box>
+                </Box>
             </Box>
         </>
     );
 };
+
+const Introduction = () => {
+
+    const TextRenderer = ({
+        value = '',
+        direction = 'r',
+        size = 'lg'
+    }) => <Text className={`text-${size} font-bold bg-clip-text text-transparent bg-gradient-to-${direction} from-blue-100 to-cyan-700`}>{value}</Text>
+
+    TextRenderer.propTypes = { value: PropTypes.string.isRequired, direction: PropTypes.string, size: PropTypes.string }
+
+    return <Box className="flex flex-col items-center justify-center">
+        <Box className="flex flex-col items-center justify-center">
+            <TextRenderer value="Welcome to Gemini AI" size="6xl" />
+            <TextRenderer value="I'm Gemini, a chatbot that can help you with your queries" direction={'l'} />
+        </Box>
+        <Box className="flex flex-col items-center justify-center">
+            <TextRenderer value="Type a message to get started" />
+        </Box>
+    </Box>
+}
 
 const RenderMessage = ({ message, msgIndex, loading, messageLength }) => {
 
