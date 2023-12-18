@@ -1,9 +1,50 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Project Title
 
-Currently, two official plugins are available:
+## Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-"# gemini-bot-react" 
+This project is an AI chatbot that uses the Gemini API from Google. It's designed for educational purposes, providing a practical example of how to implement a chat bot using Gemini API.
+
+The chatbot has the following features:
+
+- **Multi-Conversation**: The chatbot can handle multiple conversations at once. It initializes the chat by calling `startChat()`, and then uses `sendMessage()` to send new user messages. These messages, along with the chatbot's responses, are appended to the chat history.
+
+- **User and Model Roles**: The chatbot uses two roles: 'user' and 'model'. The 'user' role provides the prompts, while the 'model' role provides the responses.
+
+- **Streaming**: The chatbot uses streaming for faster interactions. Instead of waiting for the model to complete the entire generation process, the chatbot can handle partial results for quicker responses.
+
+## Dependencies
+
+This project uses the following libraries:
+
+- React
+- Vite
+- Tailwind
+- Chakra UI
+- React Markdown
+- @google/generative-ai
+
+## API Key
+
+To run this project, you'll need an API key from Google. You can get one for free at [Google AI](https://ai.google.dev/). The free API key comes with some limitations:
+
+- Rate Limit: The free API key allows for up to 60 queries per minute.
+- Data Usage: The input/output data is used to improve Google's products.
+
+## Usage
+
+To use this project:
+
+1. Clone the repository.
+2. Install the dependencies.
+3. Insert your API key.
+4. Run the project.
+
+## License
+
+This project is free to use for educational purposes.
+
+## Links
+
+- [Google AI](https://ai.google.dev/)
+- [Google AI Web QuickStart](https://ai.google.dev/tutorials/web_quickstart)
