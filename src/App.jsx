@@ -1,11 +1,13 @@
+import ChatWithGemini from './components/ChatWithGemini'
+import { Container } from '@chakra-ui/react'
 import './App.css'
 
 function App() {
 
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <Container maxW={'none'} className="App" bgColor={'black'} bgGradient={'linear(to-r, gray.800, blue.700)'} color={'black'}>
+      <ChatWithGemini />
+    </Container>
   )
 }
 
