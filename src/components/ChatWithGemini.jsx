@@ -56,9 +56,12 @@ const ChatWithGemini = () => {
             <Box className="flex max-w-[1400px]  px-10 pt-2 w-[100%] self-center">
                 <InputGroup size="md">
                     <Input color={'white'} placeholder="Type a message" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} />
-                    <InputRightElement width="4.5rem">
+                    <InputRightElement width="9rem" gap={2}>
                         <Button h="1.75rem" size="sm" onClick={handleSend}>
                             Send
+                        </Button>
+                        <Button h="1.75rem" size="sm" onClick={() => setMessages([])}>
+                            Clear
                         </Button>
                     </InputRightElement>
                 </InputGroup>
