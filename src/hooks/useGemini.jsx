@@ -3,7 +3,7 @@ import GeminiService from "../service/gemini.service";
 
 export default function useGemini() {
 
-    const [messages, updateMessage] = useState(checkForMessages());
+    const [messages, updateMessage] = useState(checkForMessages());    
     const [loading, setLoading] = useState(false);
 
     function checkForMessages() {
@@ -18,14 +18,22 @@ export default function useGemini() {
     }, [messages]);
 
     const sendMessages = async (payload) => {
+        updateMessage((prevMessages) => [...prevMessages, { "role": "model", "parts": [{ "text": "" }] }])
         setLoading(true)
         try {
             console.log("message", payload)
-            const response = GeminiService.sendMessages(payload.message, payload.history);
-            console.log('response', response)
-            const message = await response;
-            updateMessage(message)
+            const stream = await GeminiService.sendMessages(payload.message, payload.history);
+            setLoading(false)
+            for await (const chunk of stream) {
+                const chuckText = chunk.text();
+                updateMessage((prevMessages) => {
+                    const prevMessageClone = structuredClone(prevMessages);
+                    prevMessageClone[prevMessages.length - 1].parts[0].text += chuckText;
+                    return prevMessageClone;
+                })
+            }
         } catch (error) {
+            updateMessage([...messages, { "role": "model", "parts": [{ "text": "Sorry, I didn't get that. Can you try again?" }] }])
             console.error('An error occurred:', error);
         } finally {
             setLoading(false)
