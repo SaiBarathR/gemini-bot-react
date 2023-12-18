@@ -6,41 +6,24 @@ import { motion } from 'framer-motion'
 import { Text } from '@chakra-ui/react'
 import ReactMarkdown from 'react-markdown'
 import GeminiService from "../service/gemini.service";
+import useGemini from "../hooks/useGemini";
 
 const ChatWithGemini = () => {
 
-    const [messages, setMessages] = useState([])
-    const [loading, setLoading] = useState(false)
+    const { messages, loading, sendMessages, updateMessage } = useGemini()
     const [input, setInput] = useState('');
 
     const AlwaysScrollToBottom = () => {
         const elementRef = useRef();
         useEffect(() => elementRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-            inline: 'nearest',
+            behavior: 'smooth', block: 'start', inline: 'nearest',
         }));
         return <div ref={elementRef} />;
     };
 
-    const sendMessages = async (payload) => {
-        setLoading(true)
-        try {
-            console.log("message", payload)
-            const response = GeminiService.sendMessages(payload.message, payload.history);
-            console.log('response', response)
-            const message = await response;
-            setMessages(message)
-        } catch (error) {
-            console.error('An error occurred:', error);
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const handleSend = async () => {
         if (!input) return
-        setMessages([...messages, { "role": "user", "parts": [{ "text": input }] }])
+        updateMessage([...messages, { "role": "user", "parts": [{ "text": input }] }])
         setInput('')
         sendMessages({ message: input, history: messages })
     }
@@ -60,7 +43,7 @@ const ChatWithGemini = () => {
                         <Button h="1.75rem" size="sm" onClick={handleSend}>
                             Send
                         </Button>
-                        <Button h="1.75rem" size="sm" onClick={() => setMessages([])}>
+                        <Button h="1.75rem" size="sm" onClick={() => updateMessage([])}>
                             Clear
                         </Button>
                     </InputRightElement>
