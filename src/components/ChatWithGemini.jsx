@@ -36,10 +36,9 @@ const ChatWithGemini = () => {
         <>
             <Box className="w-[100%] self-center max-w-[1400px] m-4 overflow-auto rounded-md h-[80%] items-center">
                 <Box className="overflow-auto px-10 py-4 flex flex-col">
-                    {messages.length > 0 ? messages.map((message, index) => <RenderMessage loading={loading} key={index} messageLength={messages.length} message={message} msgIndex={index} />) :
+                    {messages.length > 0 ? messages.map((message, index) => <RenderMessage loading={loading} key={index + message.role} messageLength={messages.length} message={message} msgIndex={index} />) :
                         <Introduction />
                     }
-
                     <AlwaysScrollToBottom />
                 </Box>
             </Box>
@@ -111,11 +110,11 @@ const RenderMessage = ({ message, msgIndex, loading, messageLength }) => {
     </Box>
 
     return (
-        parts.map((part, index) =>
+        parts.map((part, index) => part.text ?
             <>
                 <Box
                     as={motion.div}
-                    className={`flex overflow-auto max-w-[80%] w-fit items-end my-2 p-1 px-2 rounded-md ${role === 'user' ? 'self-end' : 'self-start'}`}
+                    className={`flex overflow-auto max-w-[95%]  md:max-w-[96%] w-fit items-end my-2 p-1 px-2 rounded-md ${role === 'user' ? 'self-end' : 'self-start'}`}
                     bgColor={role === 'user' ? 'blue.500' : 'gray.200'}
                     textColor={role === 'user' ? 'white' : 'black'}
                     initial={{ opacity: 0, scale: 0.5, y: 20, x: role === 'user' ? 20 : -20 }}
@@ -124,7 +123,7 @@ const RenderMessage = ({ message, msgIndex, loading, messageLength }) => {
                 >
                     <ReactMarkdown
                         className="text-sm"
-                        key={index}
+                        key={index + part.text}
                         components={{
                             p: ({ node, ...props }) => <Text {...props} className="text-sm" />,
                             code: ({ node, ...props }) => <pre
@@ -137,7 +136,7 @@ const RenderMessage = ({ message, msgIndex, loading, messageLength }) => {
                     </ReactMarkdown>
                 </Box>
                 <Loader />
-            </>
+            </> : <Loader key={index + part.text} />
         ))
 
 }
