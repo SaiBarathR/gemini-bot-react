@@ -33,7 +33,7 @@ export default function useGemini() {
                 })
             }
         } catch (error) {
-            updateMessage([...messages, { "role": "model", "parts": [{ "text": "Sorry, I didn't get that. Can you try again?" }] }])
+            updateMessage([...messages, { "role": "model", "parts": [{ "text": "Seems like I'm having trouble connecting to the server. Please try again later." }] }])
             console.error('An error occurred:', error);
         } finally {
             setLoading(false)
