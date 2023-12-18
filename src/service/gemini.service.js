@@ -13,10 +13,8 @@ const GeminiService = (function () {
         const chat = model.startChat({
             history: prevChat,
         });
-        await chat.sendMessage(message);
-        const history = await chat.getHistory();
-        console.log("updated history:", history)
-        return history
+        const result = await chat.sendMessageStream(message);
+        return result.stream
     }
 
     return service;
