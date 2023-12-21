@@ -15,5 +15,5 @@ export default defineConfig({
   build: {
     outDir: "build"
   },
-  base: '/',
+  base: '/gemini-bot-react/'
 })
