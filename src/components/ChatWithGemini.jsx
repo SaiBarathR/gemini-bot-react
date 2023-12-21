@@ -80,17 +80,23 @@ const ChatWithGemini = () => {
 
 const Introduction = () => {
 
-    const TextRenderer = ({
-        value = '',
-        direction = 'r',
-        size = 'lg'
-    }) => <Text className={`text-${size} font-bold bg-clip-text text-transparent bg-gradient-to-${direction} from-blue-100 to-cyan-700`}>{value}</Text>
+    const TextRenderer = (props) => {
+        // eslint-disable-next-line react/prop-types
+        const { value = '', direction = 'r', size = 'large' } = props
+        return <Text
+            fontSize={size}
+            bgGradient={`linear(to-${direction}, blue.100, cyan.700)`}
+            bgClip={'text'}
+            fontWeight={'bold'}
+        >
+            {value}
+        </Text>
+    }
 
-    TextRenderer.propTypes = { value: PropTypes.string.isRequired, direction: PropTypes.string, size: PropTypes.string }
 
     return <Box className="flex flex-col items-center justify-center">
         <Box className="flex flex-col items-center justify-center">
-            <TextRenderer value="Welcome to Gemini AI" size="6xl" />
+            <TextRenderer value="Welcome to Gemini AI" size="xxx-large" />
             <TextRenderer value="I'm Gemini, a chatbot that can help you with your queries" direction={'l'} />
         </Box>
         <Box className="flex flex-col items-center justify-center">
