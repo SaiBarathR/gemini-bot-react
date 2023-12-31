@@ -13,6 +13,11 @@ The chatbot has the following features:
 
 - **Streaming**: The chatbot uses streaming for faster interactions. Instead of waiting for the model to complete the entire generation process, the chatbot can handle partial results for quicker responses.
 
+ ## Screenshots
+
+  ![Screenshot 2023-12-31 at 6 41 27 PM](https://github.com/SaiBarathR/gemini-bot-react/assets/58382813/fe6aa8e8-40bb-468a-bb21-2a8697c195ba)
+
+
 ## Dependencies
 
 This project uses the following libraries:
