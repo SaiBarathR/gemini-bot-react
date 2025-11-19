@@ -8,7 +8,7 @@ import './App.css';
 function App() {
   return (
     <SettingsProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/gemini-bot-react">
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<ChatWithGemini />} />
