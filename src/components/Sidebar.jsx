@@ -1,4 +1,4 @@
-import { MessageSquare, Settings, Moon, Sun, Github, Plus, Pin, Trash2, MoreVertical } from 'lucide-react';
+import { MessageSquare, Settings, Moon, Sun, Github, Plus, Pin, Trash2, MoreVertical, PanelLeftClose, PanelLeft } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useSettings } from '../context/SettingsContext';
 import { cn } from '../utils/cn';
@@ -10,10 +10,25 @@ const Sidebar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [menuOpenId, setMenuOpenId] = useState(null);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const menuRef = useRef(null);
 
     const toggleTheme = () => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
+        if (theme === 'light') setTheme('dark');
+        else if (theme === 'dark') setTheme('midnight');
+        else setTheme('light');
+    };
+
+    const getThemeIcon = () => {
+        if (theme === 'light') return <Sun size={18} />;
+        if (theme === 'dark') return <Moon size={18} />;
+        return <Moon size={18} className="fill-current" />; // Filled moon for midnight
+    };
+
+    const getThemeLabel = () => {
+        if (theme === 'light') return 'Light Mode';
+        if (theme === 'dark') return 'Dark Mode';
+        return 'Midnight Mode';
     };
 
     const handleNewChat = () => {
@@ -46,37 +61,41 @@ const Sidebar = () => {
 
         return (
             <div className={cn(
-                "group relative flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors",
+                "group relative flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200",
                 isActive
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                    ? "bg-zinc-800 text-white"
+                    : "text-text-secondary hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-text-primary"
             )}
                 onClick={() => handleChatClick(chat.id)}
             >
-                <MessageSquare size={18} className="flex-shrink-0" />
-                <span className="font-medium truncate text-sm flex-1">{chat.title}</span>
+                <MessageSquare size={16} className="flex-shrink-0" />
+                {!isCollapsed && (
+                    <>
+                        <span className="font-medium truncate text-sm flex-1">{chat.title}</span>
 
-                {chat.pinned && <Pin size={14} className="flex-shrink-0 rotate-45" />}
+                        {chat.pinned && <Pin size={12} className="flex-shrink-0 rotate-45 text-text-secondary" />}
 
-                {/* Action Menu Trigger */}
-                <button
-                    className={cn(
-                        "opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/20 transition-opacity",
-                        menuOpenId === chat.id && "opacity-100"
-                    )}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setMenuOpenId(menuOpenId === chat.id ? null : chat.id);
-                    }}
-                >
-                    <MoreVertical size={14} />
-                </button>
+                        {/* Action Menu Trigger */}
+                        <button
+                            className={cn(
+                                "opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-opacity",
+                                menuOpenId === chat.id && "opacity-100"
+                            )}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setMenuOpenId(menuOpenId === chat.id ? null : chat.id);
+                            }}
+                        >
+                            <MoreVertical size={14} />
+                        </button>
+                    </>
+                )}
 
                 {/* Dropdown Menu */}
-                {menuOpenId === chat.id && (
+                {menuOpenId === chat.id && !isCollapsed && (
                     <div
                         ref={menuRef}
-                        className="absolute right-2 top-8 z-50 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+                        className="absolute right-2 top-8 z-50 w-32 bg-secondary rounded-lg shadow-xl border border-border-color overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
@@ -84,7 +103,7 @@ const Sidebar = () => {
                                 pinChat(chat.id);
                                 setMenuOpenId(null);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-zinc-200 dark:hover:bg-zinc-800"
                         >
                             <Pin size={14} />
                             {chat.pinned ? 'Unpin' : 'Pin'}
@@ -94,7 +113,7 @@ const Sidebar = () => {
                                 deleteChat(chat.id);
                                 setMenuOpenId(null);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20"
                         >
                             <Trash2 size={14} />
                             Delete
@@ -113,27 +132,46 @@ const Sidebar = () => {
     const recentChats = chats.filter(c => !c.pinned);
 
     return (
-        <div className="flex flex-col h-full w-64 bg-gray-900 border-r border-gray-800 flex-shrink-0">
-            <div className="p-4">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-4 px-2">
-                    Gemini Bot
-                </h1>
+        <div className={cn(
+            "flex flex-col h-full bg-secondary border-r border-border-color flex-shrink-0 transition-all duration-300",
+            isCollapsed ? "w-16" : "w-64"
+        )}>
+            <div className="p-4 flex items-center justify-between">
+                {!isCollapsed && (
+                    <h1 className="text-lg font-bold text-text-primary px-2 tracking-tight">
+                        Gemini
+                    </h1>
+                )}
                 <button
-                    onClick={handleNewChat}
-                    className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors font-medium text-sm"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    className="p-2 text-text-secondary hover:text-text-primary hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                 >
-                    <Plus size={18} />
-                    New Chat
+                    {isCollapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-3 space-y-6">
+            <div className="px-3 mb-4">
+                <button
+                    onClick={handleNewChat}
+                    className={cn(
+                        "w-full flex items-center gap-2 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 py-2.5 rounded-lg transition-colors font-medium text-sm shadow-sm",
+                        isCollapsed ? "justify-center px-0" : "px-4"
+                    )}
+                >
+                    <Plus size={18} />
+                    {!isCollapsed && "New Chat"}
+                </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-3 space-y-6 scrollbar-thin scrollbar-thumb-zinc-800">
                 {/* Pinned Chats */}
                 {pinnedChats.length > 0 && (
                     <div className="space-y-1">
-                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2">
-                            Pinned
-                        </h3>
+                        {!isCollapsed && (
+                            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider px-3 mb-2">
+                                Pinned
+                            </h3>
+                        )}
                         {pinnedChats.map(chat => (
                             <ChatItem key={chat.id} chat={chat} />
                         ))}
@@ -142,11 +180,13 @@ const Sidebar = () => {
 
                 {/* Recent Chats */}
                 <div className="space-y-1">
-                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2">
-                        Recent
-                    </h3>
+                    {!isCollapsed && (
+                        <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider px-3 mb-2">
+                            Recent
+                        </h3>
+                    )}
                     {recentChats.length === 0 && pinnedChats.length === 0 ? (
-                        <div className="px-3 text-sm text-gray-500 italic">No chats yet</div>
+                        !isCollapsed && <div className="px-3 text-sm text-text-secondary italic">No chats yet</div>
                     ) : (
                         recentChats.map(chat => (
                             <ChatItem key={chat.id} chat={chat} />
@@ -155,38 +195,50 @@ const Sidebar = () => {
                 </div>
             </div>
 
-            <div className="p-4 border-t border-gray-800 space-y-2">
+            <div className="p-4 border-t border-border-color space-y-1">
                 <Link
                     to="/settings"
                     className={cn(
                         "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
                         location.pathname === '/settings'
-                            ? "bg-gray-800 text-white"
-                            : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                            ? "bg-zinc-800 text-white"
+                            : "text-text-secondary hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-text-primary",
+                        isCollapsed && "justify-center"
                     )}
+                    title="Settings"
                 >
                     <Settings size={18} />
-                    <span className="font-medium text-sm">Settings</span>
+                    {!isCollapsed && <span className="font-medium text-sm">Settings</span>}
                 </Link>
 
                 <button
                     onClick={toggleTheme}
-                    className="flex items-center gap-3 px-3 py-2 w-full rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+                    className={cn(
+                        "flex items-center gap-3 px-3 py-2 w-full rounded-lg text-text-secondary hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-text-primary transition-colors",
+                        isCollapsed && "justify-center"
+                    )}
+                    title="Toggle Theme"
                 >
-                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                    <span className="font-medium text-sm">
-                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                    </span>
+                    {getThemeIcon()}
+                    {!isCollapsed && (
+                        <span className="font-medium text-sm">
+                            {getThemeLabel()}
+                        </span>
+                    )}
                 </button>
 
                 <a
                     href="https://github.com/SaiBarathR/gemini-bot-react"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-3 py-2 w-full rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+                    className={cn(
+                        "flex items-center gap-3 px-3 py-2 w-full rounded-lg text-text-secondary hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-text-primary transition-colors",
+                        isCollapsed && "justify-center"
+                    )}
+                    title="GitHub"
                 >
                     <Github size={18} />
-                    <span className="font-medium text-sm">GitHub</span>
+                    {!isCollapsed && <span className="font-medium text-sm">GitHub</span>}
                 </a>
             </div>
         </div>

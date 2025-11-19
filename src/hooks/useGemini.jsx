@@ -18,19 +18,26 @@ export default function useGemini() {
     const messages = activeChat ? activeChat.messages : [];
 
     const sendMessages = async (text) => {
-        if (!activeChatId) {
-            createChat();
-            return;
+        let currentChatId = activeChatId;
+
+        if (!currentChatId) {
+            currentChatId = createChat();
         }
 
-        const currentChat = chats.find(c => c.id === activeChatId);
-        if (!currentChat) return;
+        const currentChat = chats.find(c => c.id === currentChatId) || {
+            id: currentChatId,
+            modelId: 'gemini-2.5-flash',
+            messages: []
+        };
 
         const apiKey = getApiKeyForModel(currentChat.modelId);
 
         // Optimistic update: Add user message only
-        const newHistory = [...messages, { "role": "user", "parts": [{ "text": text }] }];
-        updateChatMessages(activeChatId, newHistory);
+        // If it's a new chat, messages might be empty, so we use the found chat or default empty array
+        const currentMessages = currentChat.messages || [];
+        const newHistory = [...currentMessages, { "role": "user", "parts": [{ "text": text }] }];
+
+        updateChatMessages(currentChatId, newHistory);
 
         setLoading(true);
 
@@ -52,7 +59,13 @@ export default function useGemini() {
             let isFirstChunk = true;
 
             for await (const chunk of stream) {
-                const chunkText = chunk.text();
+                let chunkText = '';
+                try {
+                    chunkText = chunk.text();
+                } catch (e) {
+                    console.warn("Failed to get text from chunk", e);
+                    continue; // Skip chunks without text (e.g. safety blocks)
+                }
 
                 if (isFirstChunk) {
                     isFirstChunk = false;
@@ -71,7 +84,7 @@ export default function useGemini() {
                 }
 
                 // Update global state
-                updateChatMessages(activeChatId, [...currentHistory]);
+                updateChatMessages(currentChatId, [...currentHistory]);
             }
         } catch (error) {
             console.error('An error occurred:', error);
@@ -86,7 +99,7 @@ export default function useGemini() {
                 // If error happened before stream (last msg is user), add error message
                 currentHistory = [...currentHistory, { "role": "model", "parts": [{ "text": `Error: ${error.message || "Something went wrong."}` }] }];
             }
-            updateChatMessages(activeChatId, [...currentHistory]);
+            updateChatMessages(currentChatId, [...currentHistory]);
         } finally {
             setLoading(false);
         }

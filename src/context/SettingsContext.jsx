@@ -85,10 +85,14 @@ export const SettingsProvider = ({ children }) => {
 
     useEffect(() => {
         localStorage.setItem('theme', theme);
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+        const root = document.documentElement;
+
+        // Remove all potential theme classes/attributes first
+        root.classList.remove('dark');
+        root.setAttribute('data-theme', theme);
+
+        if (theme === 'dark' || theme === 'midnight') {
+            root.classList.add('dark');
         }
     }, [theme]);
 
