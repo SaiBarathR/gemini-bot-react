@@ -11,7 +11,7 @@
     --border-color: #e4e4e7;
   }
 
-  [data-theme='dark'] {
+  html[data-theme='dark'] {
     --bg-primary: #18181b;
     /* Zinc 900 */
     --bg-secondary: #27272a;
@@ -21,7 +21,7 @@
     --border-color: #3f3f46;
   }
 
-  [data-theme='midnight'] {
+  html[data-theme='midnight'] {
     --bg-primary: #000000;
     /* Black */
     --bg-secondary: #09090b;

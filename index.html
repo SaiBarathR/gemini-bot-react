@@ -6,6 +6,21 @@
   <link rel="icon" type="image/svg+xml" href="/src/icons/google.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gemini Bot</title>
+  <script>
+    (function () {
+      try {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark' || savedTheme === 'midnight') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {
+        console.error('Error setting initial theme:', e);
+      }
+    })();
+  </script>
 </head>
 
 <body>

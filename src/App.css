@@ -10,20 +10,24 @@
 /* ScrollBar CSS */
 
 ::-webkit-scrollbar-track {
-    background-color: rgba(237, 240, 242, 0.5);
+    background-color: var(--bg-secondary);
     border-radius: 5px;
 }
 
 ::-webkit-scrollbar {
-    width: 4px;
-    height: 8px;
-    background-color: rgb(240, 240, 240);
+    width: 6px;
+    height: 6px;
+    background-color: var(--bg-primary);
     border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgb(190, 190, 190);
+    background-color: var(--border-color);
     border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-secondary);
 }
 
 /* Loader */
