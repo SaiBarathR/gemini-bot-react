@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Send, Trash2, Bot, User, Loader2, ChevronDown, Copy, Check, Sparkles, Code, BookOpen, Lightbulb } from 'lucide-react';
+import { useEffect, useRef, useState } from "react";
+import { Send, Bot, Loader2, ChevronDown, Copy, Check, Sparkles, Code, BookOpen, Lightbulb } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -10,7 +10,7 @@ import { useSettings } from "../context/SettingsContext";
 import { cn } from "../utils/cn";
 
 const ChatWithGemini = () => {
-    const { messages, loading, sendMessages, clearMessages } = useGemini();
+    const { messages, loading, sendMessages } = useGemini();
     const { activeChatId, chats, updateChat, availableModels } = useSettings();
     const [input, setInput] = useState('');
     const scrollRef = useRef(null);
