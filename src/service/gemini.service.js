@@ -1,23 +1,34 @@
-import { GoogleGenerativeAI, } from "@google/generative-ai";
-import { config } from "../utils/config";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GeminiService = (function () {
+const GeminiService = {
+    sendMessages: async function (message, history, apiKey, modelName) {
+        if (!apiKey) {
+            throw new Error("API Key is required");
+        }
 
-    const MODEL_NAME = "gemini-pro";
-    const API_KEY = config.API_KEY;
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const service = {};
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: modelName });
 
-    service.sendMessages = async function (message, prevChat) {
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
         const chat = model.startChat({
-            history: prevChat,
+            history: history,
         });
-        const result = await chat.sendMessageStream(message);
-        return result.stream
-    }
 
-    return service;
-}());
+        const makeRequest = async (retries = 3, delay = 1000) => {
+            try {
+                const result = await chat.sendMessageStream(message);
+                return result.stream;
+            } catch (error) {
+                if ((error.status === 503 || error.message.includes('503')) && retries > 0) {
+                    console.log(`Model overloaded, retrying in ${delay}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return makeRequest(retries - 1, delay * 2);
+                }
+                throw error;
+            }
+        };
+
+        return makeRequest();
+    }
+};
 
 export default GeminiService;
